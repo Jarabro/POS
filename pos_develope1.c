@@ -21,14 +21,12 @@ int main()
 	char password[10] = "1234";				//Password설정 (초기 password : 1234)
 	char name_1[20] = "Lee Jung Ho";
 	char check_name[20] = "확인";
-	unsigned balance = 1234000;
-	int time = 0;
-
-	time_t timer = time(NULL);		
+	unsigned int balance = 1234000u;
+			
 
 	login_check(identification, password);
 	employee_confirmation(name_1, check_name);
-	time_checking(time, balance)
+	
 
 	return 0;
 }
@@ -78,13 +76,3 @@ void employee_confirmation(char name[20], char check_name[20])
 	}			
 }
 
-int time_checking(int time, int balance)
-{
-	for(unsigned int i = 0; i < MAX_INT; i++)
-	{
-		for(unsigned int j = 0; j < ; j++)
-		{
-			time += i * j
-		}
-	}
-}
