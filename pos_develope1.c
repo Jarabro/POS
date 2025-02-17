@@ -14,7 +14,9 @@
 						
 void login_check();		// 로그인 함수 선언
 void employee_confirmation();
-int time_checking(int, int);
+int show_menu();
+int insert_menu();
+
 int main()
 {
 	char identification[10] = "admin";		//ID 설정 (초기 ID : admin)
@@ -22,11 +24,15 @@ int main()
 	char name_1[20] = "Lee Jung Ho";
 	char check_name[20] = "확인";
 	unsigned int balance = 1234000u;
-			
+	int select_menu = 0;
 
 	login_check(identification, password);
 	employee_confirmation(name_1, check_name);
-	
+	select_menu = show_menu();
+	if(select_menu == 1)
+	{
+		insert_menu();
+	}
 
 	return 0;
 }
@@ -74,5 +80,34 @@ void employee_confirmation(char name[20], char check_name[20])
 		printf("다시실행하세요\n");
 		exit(0);
 	}			
+}
+//메뉴 보여주기
+int show_menu()
+{
+	int select_menu = select_menu;
+	printf("1.제품 입력\t2.제품 확인\t3.제품 입고\t4.계산\t5.종료 \n");
+	printf("메뉴 선택(숫자 입력1~5): ");
+	scanf("%d", &select_menu);
+	return select_menu;
+}	
+
+int insert_menu()
+{
+	char product_insert [20] = {};
+	char product_company [20] = {};
+	char product_time_limit [20] = {};
+	char product_adult [20] = {};
+	int product_price [20] = {};
+	printf("제품메뉴구성 \n");
+	printf("1.제품명입력:");
+	scanf("%c", &product_insert[i]);
+	printf("2.제조회사입력:");
+	scanf("");
+	printf("3.유통기한입력:");
+	scanf("");
+	printf("4.19금물품유무");
+	scanf("");
+	printf("5.가격");
+	scanf("");
 }
 
