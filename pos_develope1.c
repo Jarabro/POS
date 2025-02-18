@@ -19,7 +19,7 @@ int show_menu();
 void insert_menu();
 void product_check_menu();
 void product_receving_menu();
-int paying_menu();
+void paying_menu();
 
 struct Product
 {
@@ -35,19 +35,20 @@ struct Product
 struct Product productlist[100];
 int product_count = 0;
 int num = 0;
+unsigned int balance = 1234000u;
 int main()
 {
 	const char identification[10] = "admin";		//ID 설정 (초기 ID : admin)
 	const char password[10] = "1234";				//Password설정 (초기 password : 1234)
 	const char name_1[20] = "Lee Jung Ho";
 	char check_name[20] = "확인";
-	unsigned int balance = 1234000u;
 	int select_menu = 0;
 	char product_name[20], product_company[20], product_time_limit[20], product_check_adult[20];
 	int product_price[20];
 	login_check(identification, password);
 	employee_confirmation(name_1, check_name);
 	while(1){	
+		printf("잔고 : %d", balance);
 	select_menu = show_menu();
 		if(select_menu == 1)
 		{
@@ -210,12 +211,54 @@ void product_receving_menu()
 	insert_menu();
 }
 
-int paying_menun(unsigned int balance)
+void paying_menu()
 {
-	printf("번호\t|제품\t|가격\t|(1)성인물품\n");
+	int buy_check = 0;
+	int card_or_cash = 0;
+	char buy_product[50];
+	printf("번호\t|제품\t|가격\t|(1)성인물품\t|재고\n");
 	for(int i = 0; i < product_count; i++)
 	{
-		printf("%d\t| %s\t| %d\t| %d ", i+1, productlist[i].name, productlist[i].price, productlist[i].adult);
+		printf("%d\t| %s\t| %d\t| %d\t| %d \n", i+1, productlist[i].name, productlist[i].price, productlist[i].adult, productlist[i].product_total);
 	}
-	printf("어떤 제품을 구매하시겠습니까?");
+	printf("어떤 제품을 원하시나요?(제품 이름입력)");
+	scanf("%s", buy_product);
+	
+	for(int i = 0; i < product_count; i++)
+	{
+		if(!strcmp(productlist[i].name, buy_product));
+		{
+			printf("%s %d개 남았습니다. 구매하시겠습니까?(구매:1 or구매안함:2): \n", productlist[i].name, productlist[i].product_total);
+			scanf("%d", &buy_check);
+			if(buy_check == 1)
+			{
+				printf("카드 or 현금?(카드1 현금2) : ");
+				scanf("%d", &card_or_cash);
+				if(card_or_cash == 1)
+				{ 
+					int card = 0;
+					card = productlist[i].price;
+					balance = balance - card;
+					printf("남은잔고: %d", balance);
+				}
+				else if(card_or_cash == 2)
+				{
+				}
+				else
+				{
+					printf("잘못 입력하셨습니다.");
+					break;
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+		else
+		{
+			printf("그런제품은 없습니다 \n");
+			break;
+		}
+	}
 }
