@@ -11,12 +11,27 @@
 #include <string.h>		//	스트링 헤더 호출
 #include <time.h>		//	타임 헤더 호출
 #include <stdlib.h>
-						
+		
+#define NAME_LENGTH 50
 void login_check();		// 로그인 함수 선언
 void employee_confirmation();
 int show_menu();
-int insert_menu();
+void insert_menu();
+int product_check_menu();
+int product_receving_menu();
+int calculation_menu();
 
+struct Product
+{
+	char name[NAME_LENGTH];
+	char company[NAME_LENGTH];
+	char time[NAME_LENGTH];
+	int adult;
+	int price;
+};
+
+struct Product productlist[100];
+int product_count = 1;
 int main()
 {
 	char identification[10] = "admin";		//ID 설정 (초기 ID : admin)
@@ -25,15 +40,37 @@ int main()
 	char check_name[20] = "확인";
 	unsigned int balance = 1234000u;
 	int select_menu = 0;
-
+	char product_name[20], product_company[20], product_time_limit[20], product_check_adult[20];
+	int product_price[20];
 	login_check(identification, password);
 	employee_confirmation(name_1, check_name);
+	while(1){	
 	select_menu = show_menu();
-	if(select_menu == 1)
-	{
-		insert_menu();
+		if(select_menu == 1)
+		{
+			insert_menu();
+		}
+		else if(select_menu == 2)
+		{
+//			product_check_menu();
+		}
+		else if(select_menu == 3)
+		{
+//			product_receving_menu();
+		}
+		else if(select_menu == 4)
+		{
+//			calculation_menu();
+		}
+		else if(select_menu == 5)
+		{
+			break;
+		}
+		else
+		{
+			printf("잘못입력하셨습니다. 1~5번 입력해주세요");
+		}
 	}
-
 	return 0;
 }
 
@@ -81,7 +118,7 @@ void employee_confirmation(char name[20], char check_name[20])
 		exit(0);
 	}			
 }
-//메뉴 보여주기
+//메뉴 보여주기;
 int show_menu()
 {
 	int select_menu = select_menu;
@@ -90,24 +127,37 @@ int show_menu()
 	scanf("%d", &select_menu);
 	return select_menu;
 }	
-
-int insert_menu()
+//제품 입력 메뉴
+void insert_menu()
 {
-	char product_insert [20] = {};
-	char product_company [20] = {};
-	char product_time_limit [20] = {};
-	char product_adult [20] = {};
-	int product_price [20] = {};
-	printf("제품메뉴구성 \n");
-	printf("1.제품명입력:");
-	scanf("%c", &product_insert[i]);
-	printf("2.제조회사입력:");
-	scanf("");
-	printf("3.유통기한입력:");
-	scanf("");
-	printf("4.19금물품유무");
-	scanf("");
-	printf("5.가격");
-	scanf("");
+	
+	if(product_count > 100)
+	{
+		printf("제품을 추가할 수 없습니다. \n");
+	}
+	else if(product_count < 11)
+	{
+		printf("최소 제품입력은 10개입니다.");
+		for(int i = 0; i < 10; i++){
+			printf("현재 제품입력수 [%d 개]\n", product_count);
+			printf("제품명입력: "); scanf("%s", productlist[product_count].name);
+			printf("제조회사입력: "); scanf("%s", productlist[product_count].company);
+			printf("유통기한입력: "); scanf("%s", productlist[product_count].time);
+			printf("19금물품유무(0or1(19)입력하세요): "); scanf("%d", &(productlist[product_count].adult));
+			printf("가격: "); scanf("%d", &(productlist[product_count].price));
+			printf("제품 추가 완료\n");
+			product_count++;
+		}
+	}
+	else
+	{
+		printf("제품명입력: "); scanf("%s", productlist[product_count].name);
+		printf("제조회사입력: "); scanf("%s", productlist[product_count].company);
+		printf("유통기한입력: "); scanf("%s", productlist[product_count].time);
+		printf("19금물품유무(0or1(19)입력하세요):"); scanf("%d", &(productlist[product_count].adult));
+		printf("가격: "); scanf("%d", &(productlist[product_count].price));
+		printf("제품 추가 완료\n");
+		product_count++;
+	}
 }
 
