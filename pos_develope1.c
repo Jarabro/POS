@@ -226,9 +226,9 @@ void paying_menu()
 	
 	for(int i = 0; i < product_count; i++)
 	{
-		if(!strcmp(productlist[i].name, buy_product));
+		if(!strcmp(productlist[i].name, buy_product))
 		{
-			printf("%s %d개 남았습니다. 구매하시겠습니까?(구매:1 or구매안함:2): \n", productlist[i].name, productlist[i].product_total);
+			printf("%s은 %d개 남았습니다. 구매하시겠습니까?(구매:1 or구매안함:2): \n", productlist[i].name, productlist[i].product_total);
 			scanf("%d", &buy_check);
 			if(buy_check == 1)
 			{
@@ -238,11 +238,19 @@ void paying_menu()
 				{ 
 					int card = 0;
 					card = productlist[i].price;
-					balance = balance - card;
-					printf("남은잔고: %d", balance);
+					balance = balance + card;
+					printf("남은잔고: %d \n", balance);
 				}
 				else if(card_or_cash == 2)
 				{
+					int cash = 0;
+					int cash2 = 0;
+					printf("낼 현금 입력: ");
+					scanf("%d", &cash);
+					//여기서 그거 거스룸돈 하자
+					cash2 = cash - productlist[i].price;
+					balance = balance - cash2
+					printf("%d받았습니다. 거스름돈: %d", cash);
 				}
 				else
 				{
