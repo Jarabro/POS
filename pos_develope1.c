@@ -20,6 +20,7 @@ void insert_menu();
 void product_check_menu();
 void product_receving_menu();
 void paying_menu();
+void product_buy();
 
 struct Product
 {
@@ -32,6 +33,7 @@ struct Product
 };
 //전역변수들
 
+int product_buy_num = 0;
 struct Product productlist[100];
 int product_count = 0;
 int num = 0;
@@ -48,7 +50,7 @@ int main()
 	login_check(identification, password);
 	employee_confirmation(name_1, check_name);
 	while(1){	
-		printf("잔고 : %d", balance);
+		printf("잔고 : %d\n", balance);
 	select_menu = show_menu();
 		if(select_menu == 1)
 		{
@@ -101,6 +103,7 @@ void login_check(char arr1[10], char arr2[10])	//admin과 1234를 arr1, arr2에 
 		printf("login default try again\n");
 	}
 	}
+	system("clear");
 }
 //사원 확인 하기
 void employee_confirmation(char name[20], char check_name[20])
@@ -121,6 +124,7 @@ void employee_confirmation(char name[20], char check_name[20])
 		printf("다시실행하세요\n");
 		exit(0);
 	}			
+	system("clear");
 }
 //메뉴 보여주기;
 int show_menu()
@@ -131,17 +135,18 @@ int show_menu()
 	printf("메뉴 선택(숫자 입력1~5): ");
 	scanf("%d", &select_menu);
 	printf("==================================== \n");
+	system("clear");
 	return select_menu;
 }	
 //제품 입력 메뉴
 void insert_menu()
 {
 	int product_plus = 0;
-	if(num == 0)
+	if(num == 0) //이건 입고가 아닐시 출력하는거
 	{
 		if(product_count < 10)
 		{
-			printf("최소 제품입력은 10개입니다.");
+			printf("최소 제품입력은 10개입니다.");			//처음실행시 제품입력 10개하기
 			for(int i = 0; i < 10; i++){
 				printf("현재 제품입력수 [%d 개]\n", product_count);
 				printf("제품명입력: "); scanf("%s", productlist[product_count].name);
@@ -153,7 +158,7 @@ void insert_menu()
 				product_count++;
 			}
 		}
-		else if(product_count < 101 && product_count >= 10)
+		else if(product_count < 101 && product_count >= 10)			//제품이 10개이상이면 무조건 1개씩 제품추가
 		{
 			printf("제품명입력: "); scanf("%s", productlist[product_count].name);
 			printf("제조회사입력: "); scanf("%s", productlist[product_count].company);
@@ -167,8 +172,11 @@ void insert_menu()
 		{
 			printf("제품을 추가할 수 없습니다. \n");
 		}
-	}	
-	else if(num != 0)
+		
+		system("clear");
+}	
+
+	else if(num != 0)					//제품 입고시 출력하는것
 		{
 			printf("몇개 입고하시겠습니까?: ");
 			scanf("%d", &product_plus); //product_total
@@ -194,6 +202,7 @@ void product_check_menu()
 		printf("\n");
 	}
 	printf("\n");
+
 }
 
 void product_receving_menu()
@@ -205,68 +214,105 @@ void product_receving_menu()
 		printf("%d.이름: %s | 제조회사: %s | 유통기한:%s | 19금물품: %d | 가격: %d \n", 
 		i+1, productlist[i].name, productlist[i].company, productlist[i].time, productlist[i].adult, productlist[i].price);
 	}
-	printf("어떤 상품을 입고하시겠습니까? 번호입력: ");
-	scanf("%d", &(num));
-	printf("==============================================");
-	insert_menu();
+	printf("어떤 상품을 입고하시겠습니까? 번호입력: ");		//상품 입고 번호 입력
+	scanf("%d", &(num));	//전역변수 num에다가 받음
+	printf("==============================================\n");
+	insert_menu();		//그후 인서트 메뉴로 진행
+	
 }
 
 void paying_menu()
 {
-	int buy_check = 0;
-	int card_or_cash = 0;
-	char buy_product[50];
-	printf("번호\t|제품\t|가격\t|(1)성인물품\t|재고\n");
-	for(int i = 0; i < product_count; i++)
+	char productname[50];
+	for(int i=0; i < product_count; i++)	//제품목록을 보여준다
 	{
-		printf("%d\t| %s\t| %d\t| %d\t| %d \n", i+1, productlist[i].name, productlist[i].price, productlist[i].adult, productlist[i].product_total);
+		printf("%d. 제품이름:%s \t|제조회사:%s \t|유통기한:%s \t|성인물품:%d \t|가격:%d \t|남은갯수:%d |\n",
+				i+1, productlist[i].name, productlist[i].company, productlist[i].time, productlist[i].adult, productlist[i].price, productlist[i].product_total);
 	}
-	printf("어떤 제품을 원하시나요?(제품 이름입력)");
-	scanf("%s", buy_product);
-	
+
+	printf("어떤 제품을 구입하시겠습니까?(제품이름 입력): ");
+	scanf("%s", productname);	//제품구매 이름  입력받음 productnumber에 저장;
 	for(int i = 0; i < product_count; i++)
-	{
-		if(!strcmp(productlist[i].name, buy_product))
+	{	
+		if(productlist[i].product_total > 0) //제품 갯수가 1개 이상이라면 실행시켜라
 		{
-			printf("%s은 %d개 남았습니다. 구매하시겠습니까?(구매:1 or구매안함:2): \n", productlist[i].name, productlist[i].product_total);
-			scanf("%d", &buy_check);
-			if(buy_check == 1)
+			if(!strcmp(productlist[i].name, productname))
 			{
-				printf("카드 or 현금?(카드1 현금2) : ");
-				scanf("%d", &card_or_cash);
-				if(card_or_cash == 1)
-				{ 
-					int card = 0;
-					card = productlist[i].price;
-					balance = balance + card;
-					printf("남은잔고: %d \n", balance);
-				}
-				else if(card_or_cash == 2)
+				if(productlist[i].adult > 0)//성인물품일시
 				{
-					int cash = 0;
-					int cash2 = 0;
-					printf("낼 현금 입력: ");
-					scanf("%d", &cash);
-					//여기서 그거 거스룸돈 하자
-					cash2 = cash - productlist[i].price;
-					balance = balance - cash2
-					printf("%d받았습니다. 거스름돈: %d", cash);
+					printf("성인물품입니다.\n");
+					printf("성인인증을 진행하겠습니다.");
+					//성인인증함수 만들기
+					product_buy(productlist[i].price);
+					if(product_buy_num > 0) //구매개수가 1개이상일때만 진행
+					{
+						productlist[i].product_total -= product_buy_num; //재고갯수 제거
+					}
+					
+					break;
 				}
-				else
+				else//성인물품이 아닐시
 				{
-					printf("잘못 입력하셨습니다.");
+					product_buy(productlist[i].price);
+					if(product_buy_num > 0) //구매개수가 1개이상일때만 진행
+					{
+						productlist[i].product_total -= product_buy_num;
+					}
 					break;
 				}
 			}
-			else
+		}
+		else if(productlist[i].product_total == 0)
+		{
+			printf("재고가 부족합니다 \n"); //재고부족시 실행 X
+			break;
+		}
+	}
+	
+}
+void product_buy(int price)
+{
+	int card_cash = 0;
+	int card = 0;
+	unsigned int cash = 0u;
+	printf("몇개 구입?: ");
+	scanf("%d", &(product_buy_num));
+	if(product_buy_num > 0)
+	{
+		printf("카드or현금?(카드1현금2):");
+		scanf("%d", &card_cash);
+		if(card_cash == 1)
+		{
+			
+			printf("카드결제금액을 입력하세요: ");
+			scanf("%d", &card);
+			balance += price * product_buy_num; // 물건값 * 사는갯수를 잔고에서 차감
+			printf("결제금액: %d 입니다. \n", price*product_buy_num);
+		}
+		else if(card_cash == 2)
+		{
+			printf("현금 입력: ");
+			scanf("%d", &cash);
+			if(price * product_buy_num < cash) // 낸 현금이 물건값보다 많을시 진행
 			{
-				break;
+				balance +=  price * product_buy_num; // 물건값 * 사는갯수를 잔고에서 차감
+				cash = cash - price * product_buy_num;
+				printf("결제금액: %d 입니다. 거스름돈: %d\n", price*product_buy_num, cash);
+			}
+			if(price * product_buy_num > cash) //낸 현금이 물건값보다 적을시 진행
+			{
+				printf("현금이 부족합니다.\n");
+				product_buy_num = 0;		//구매개수를 0으로 초기화
 			}
 		}
 		else
 		{
-			printf("그런제품은 없습니다 \n");
-			break;
+			printf("1개이상 구매하셔야합니다.\n");
 		}
+
+	}
+	else
+	{
+		printf("구매취소하셨습니다\n");
 	}
 }
