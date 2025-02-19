@@ -3,7 +3,7 @@
  * 제작자 : 이정호 (LEE JUNG HO)
  * 버전 : 0.0.1 
  * 제작기간 : 2025-02-14 ~ ing
- * 최근 수정일자 : 2025-02-18
+ * 최근 수정일자 : 2025-02-19
  * Project POS
  */
 
@@ -33,6 +33,9 @@ struct Product
 };
 //전역변수들
 
+
+
+
 int product_buy_num = 0;
 struct Product productlist[100];
 int product_count = 0;
@@ -47,6 +50,12 @@ int main()
 	int select_menu = 0;
 	char product_name[20], product_company[20], product_time_limit[20], product_check_adult[20];
 	int product_price[20];
+	int time_pay = 9200;
+	int time_min = 0;
+	int day_money = 0;
+	time_t start = time(NULL);
+	
+
 	login_check(identification, password);
 	employee_confirmation(name_1, check_name);
 	while(1){	
@@ -70,6 +79,10 @@ int main()
 		}
 		else if(select_menu == 5)
 		{
+			time_t end = time(NULL);
+			time_min = (double)(end - start) / 60;
+			day_money = time_pay * time_min;
+			printf("총 %d분 일했습니다 오늘 일당은: %d\n", time_min, day_money);
 			break;
 		}
 		else
@@ -131,7 +144,7 @@ int show_menu()
 {
 	int select_menu = select_menu;
 	printf("==================================== \n");
-	printf("1.제품 입력\t2.제품 확인\t3.제품 입고\t4.계산\t5.종료 \n");
+	printf("1.제품 입력\t2.제품 확인(제품 찾기)\t3.제품 입고\t4.계산\t5.종료 \n");
 	printf("메뉴 선택(숫자 입력1~5): ");
 	scanf("%d", &select_menu);
 	printf("==================================== \n");
@@ -186,9 +199,10 @@ void insert_menu()
 	}
 	
 }
-
+//제품확인메뉴
 void product_check_menu()
 {
+	char product_find[50];
 	for(int i = 0; i < product_count; i++)
 	{
 		printf("%s ", productlist[i].name);
@@ -201,10 +215,24 @@ void product_check_menu()
 		printf("(%d개)", productlist[i].product_total);
 		printf("\n");
 	}
+	printf("찾으실 제품을 입력하세요: ");
+	scanf("%s", product_find);
+	for(int i = 0; i < product_count; i++)
+	{
+		if(!strcmp(productlist[i].name, product_find));
+		{
+			printf("이름:%s |제조회사: %s|유통기한: %s|19금물품: %d|가격: %d \n", 
+					productlist[i].name, productlist[i].company, productlist[i].time, productlist[i].adult, productlist[i].price);
+		}
+		else
+		{
+			printf("그런제품은 없습니다.");
+		}
+	}
 	printf("\n");
 
 }
-
+//제품 입고 메뉴
 void product_receving_menu()
 {
 	
@@ -220,7 +248,7 @@ void product_receving_menu()
 	insert_menu();		//그후 인서트 메뉴로 진행
 	
 }
-
+//제품 구매 메뉴
 void paying_menu()
 {
 	char productname[50];
@@ -243,7 +271,8 @@ void paying_menu()
 					printf("성인물품입니다.\n");
 					printf("성인인증을 진행하겠습니다.");
 					//성인인증함수 만들기
-					product_buy(productlist[i].price);
+					//유통기한 체크함수만들기
+					product_buy(productlist[i].price); //계산진행함수 call
 					if(product_buy_num > 0) //구매개수가 1개이상일때만 진행
 					{
 						productlist[i].product_total -= product_buy_num; //재고갯수 제거
@@ -253,6 +282,7 @@ void paying_menu()
 				}
 				else//성인물품이 아닐시
 				{
+					//유통기한 체크함수 만들기
 					product_buy(productlist[i].price);
 					if(product_buy_num > 0) //구매개수가 1개이상일때만 진행
 					{
@@ -270,6 +300,7 @@ void paying_menu()
 	}
 	
 }
+//제품 구매 함수
 void product_buy(int price)
 {
 	int card_cash = 0;
