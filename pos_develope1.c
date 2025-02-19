@@ -21,6 +21,7 @@ void product_check_menu();
 void product_receving_menu();
 void paying_menu();
 void product_buy();
+int adult_checking();
 
 struct Product
 {
@@ -247,6 +248,7 @@ void product_receving_menu()
 //제품 구매 메뉴
 void paying_menu()
 {
+	int adult_check = 0;					//성인인증 리턴값 받을 변수
 	char productname[50];
 	for(int i=0; i < product_count; i++)	//제품목록을 보여준다
 	{
@@ -255,31 +257,37 @@ void paying_menu()
 	}
 
 	printf("어떤 제품을 구입하시겠습니까?(제품이름 입력): ");
-	scanf("%s", productname);	//제품구매 이름  입력받음 productnumber에 저장;
+	scanf("%s", productname);	//제품구매 이름  입력받음 productname에 저장;
 	for(int i = 0; i < product_count; i++)
 	{	
-		if(productlist[i].product_total > 0) //제품 갯수가 1개 이상이라면 실행시켜라
+		if(!strcmp(productlist[i].name, productname)) //제품이름 확인
 		{
-			if(!strcmp(productlist[i].name, productname))
+			if(productlist[i].product_total > 0) //제품개수가 1개이상이면 실행
 			{
 				if(productlist[i].adult > 0)//성인물품일시
 				{
 					printf("성인물품입니다.\n");
 					printf("성인인증을 진행하겠습니다.");
-					//성인인증함수 만들기
+					adult_check = adult_checking();
 					//유통기한 체크함수만들기
-					product_buy(productlist[i].price); //계산진행함수 call
-					if(product_buy_num > 0) //구매개수가 1개이상일때만 진행
+					if(adult_check == 1) // 리턴값이 1일시 성인인증 통과
 					{
-						productlist[i].product_total -= product_buy_num; //재고갯수 제거
+						product_buy(productlist[i].price,productlist[i].product_total); //계산진행함수 call
+						if(product_buy_num > 0) //구매개수가 1개이상일때만 진행
+						{
+							productlist[i].product_total -= product_buy_num; //재고갯수 제거
+						}
 					}
-					
+					else//리턴값이 1이 아닐시 성인인증 실패 !
+					{
+						printf("미성년자입니다. 따끔하게 혼내세요!");
+					}
 					break;
 				}
-				else//성인물품이 아닐시
+				else//성인물품이 아닐시 
 				{
 					//유통기한 체크함수 만들기
-					product_buy(productlist[i].price);
+					product_buy(productlist[i].price,productlist[i].product_total);
 					if(product_buy_num > 0) //구매개수가 1개이상일때만 진행
 					{
 						productlist[i].product_total -= product_buy_num;
@@ -288,23 +296,17 @@ void paying_menu()
 				}
 			}
 		}
-		else if(productlist[i].product_total == 0)
-		{
-			printf("재고가 부족합니다 \n"); //재고부족시 실행 X
-			break;
-		}
-	}
-	
+	}//for문종료
 }
 //제품 구매 함수
-void product_buy(int price)
+void product_buy(int price, int total)
 {
 	int card_cash = 0;
 	int card = 0;
 	unsigned int cash = 0u;
 	printf("몇개 구입?: ");
 	scanf("%d", &(product_buy_num));
-	if(product_buy_num > 0)
+	if(product_buy_num > 0 && product_buy_num <= total)
 	{
 		printf("카드or현금?(카드1현금2):");
 		scanf("%d", &card_cash);
@@ -318,7 +320,7 @@ void product_buy(int price)
 		}
 		else if(card_cash == 2)
 		{
-			printf("현금 입력: ");
+			printf("얼마를 내시겠습니까?: ");
 			scanf("%d", &cash);
 			if(price * product_buy_num < cash) // 낸 현금이 물건값보다 많을시 진행
 			{
@@ -336,10 +338,30 @@ void product_buy(int price)
 		{
 			printf("1개이상 구매하셔야합니다.\n");
 		}
-
 	}
 	else
 	{
 		printf("구매취소하셨습니다\n");
 	}
 }
+
+int adult_checking()
+{
+	int year = 2025;
+	int birthyear = 0;
+	printf("태어난 연도를 적어주세요: ");
+	scanf("%d", &birthyear);
+	
+	year = year - birthyear;
+	
+	if(year >= 19)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+
