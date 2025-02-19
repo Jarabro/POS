@@ -81,7 +81,7 @@ int main()
 		else if(select_menu == 5)
 		{
 			time_t end = time(NULL);
-			time_min = (double)(end - start) / 60;
+			time_min = (int)(end - start) / 60;
 			day_money = time_pay * time_min;
 			printf("총 %d분 일했습니다 오늘 일당은: %d\n", time_min, day_money);
 			break;
