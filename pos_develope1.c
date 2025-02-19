@@ -219,14 +219,10 @@ void product_check_menu()
 	scanf("%s", product_find);
 	for(int i = 0; i < product_count; i++)
 	{
-		if(!strcmp(productlist[i].name, product_find));
+		if(!strcmp(productlist[i].name, product_find))
 		{
 			printf("이름:%s |제조회사: %s|유통기한: %s|19금물품: %d|가격: %d \n", 
 					productlist[i].name, productlist[i].company, productlist[i].time, productlist[i].adult, productlist[i].price);
-		}
-		else
-		{
-			printf("그런제품은 없습니다.");
 		}
 	}
 	printf("\n");
