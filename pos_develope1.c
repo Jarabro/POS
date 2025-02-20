@@ -1,97 +1,81 @@
 /*
  * 제목 : POS 개발
- * 제작자 : 이정호 (LEE JUNG HO)
+ * 제작자 : 이정호 (Lee Jung Ho)
  * 버전 : 0.0.1 
- * 제작기간 : 2025-02-14 ~ ing
- * 최근 수정일자 : 2025-02-19
+ * 제작기간 : 2025-02-14 ~ 2025-02-20
+ * 최근 수정일자 : 2025-02-20
  * Project POS
  */
 
 #include <stdio.h>		//	입출력 헤더 호출
 #include <string.h>		//	스트링 헤더 호출
 #include <time.h>		//	타임 헤더 호출
-#include <stdlib.h>
+#include <stdlib.h>		// stdlib헤더 호출
 		
-#define NAME_LENGTH 50
-void login_check();		// 로그인 함수 선언
-void employee_confirmation();
-int show_menu();
-void insert_menu();
-void product_check_menu();
-void product_receving_menu();
-void paying_menu();
-void product_buy();
-int adult_checking();
+#define NAME_LENGTH 50	//배열의 길이 설정
+				
+void login_check();				// 로그인 함수 
+void employee_confirmation();	// 사원 확인 함수 
+int show_menu();				// 메뉴 보여주기 함수
+void insert_menu();				// 제품 입력 함수
+void product_check_menu();		// 제품 확인 함수
+void product_receving_menu();	// 제품 입고 함수
+void paying_menu();				// 제품 구매 함수
+void product_buy();				// 제품금액 지불 함수
+int adult_checking();			// 성인인증 함수
 
-struct Product
+struct Product						//Product 구조체
 {
-	char name[NAME_LENGTH];
-	char company[NAME_LENGTH];
-	char time[NAME_LENGTH];
-	int adult;
-	int price;
-	int product_total;
+	char name[NAME_LENGTH];			//이름 [50제한]
+	char company[NAME_LENGTH];		//제조회사 [50제한]
+	char time[NAME_LENGTH];			//유통기한 [50제한]
+	int adult;						//성인확인
+	int price;						//가격
+	int product_total;				//한개의 입고된 제품 갯수
 };
+
 //전역변수들
+int product_buy_num = 0;				//구매개수
+struct Product productlist[100];		//구조체 Product를 100개의 배열로 선언
+int product_count = 0;					//총제품 개수 
+int num = 0;							//입고 확인 변수
+unsigned int balance = 1234000u;		//pos기 잔고 변수 [음수가 안나오도록 unsigned]
 
-
-
-
-int product_buy_num = 0;
-struct Product productlist[100];
-int product_count = 0;
-int num = 0;
-unsigned int balance = 1234000u;
-int main()
+int main()		
 {
 	const char identification[10] = "admin";		//ID 설정 (초기 ID : admin)
 	const char password[10] = "1234";				//Password설정 (초기 password : 1234)
-	const char name_1[20] = "Lee Jung Ho";
-	char check_name[20] = "확인";
-	int select_menu = 0;
-	char product_name[20], product_company[20], product_time_limit[20], product_check_adult[20];
-	int product_price[20];
-	int time_pay = 9200;
-	int time_min = 0;
-	int day_money = 0;
-	time_t start = time(NULL);
+	const char name_1[20] = "Lee Jung Ho";			//이름 출력
+	char check_name[20] = "확인";					
+	int select_menu = 0;							//메뉴 입력받기위한 변수
+	int time_pay = 9200;							//시급
+	int time_min = 0;								//1분당 시급을 받기때문에 일한 시간을 저장할 변수
+	int day_money = 0;								//하루 일당을 저장할 변수
+	time_t start = time(NULL);						//실행 시간 저장
 	
 
-	login_check(identification, password);
-	employee_confirmation(name_1, check_name);
-	while(1){	
+	login_check(identification, password);			//로그인 확인 함수 호출
+	employee_confirmation(name_1, check_name);		//사원 확인 함수호출
+	
+	while(1)//무한반복 (종료전까지 메뉴를 계속 보여줌)
+	{	
 		printf("잔고 : %d\n", balance);
-	select_menu = show_menu();
-		if(select_menu == 1)
+	select_menu = show_menu();									//메뉴 보여주기 함수 호출
+		if(select_menu == 1){insert_menu();}					//1선택시 제품 입력 함수 호출
+		else if(select_menu == 2){product_check_menu();}		//2선택시 제품 확인 함수 호출
+		else if(select_menu == 3){product_receving_menu();}		//3선택시 제품 입고 함수 호출
+		else if(select_menu == 4){paying_menu();}				//4선택시 제품 구매 함수 호출
+		else if(select_menu == 5)								//종료 함수 호출
 		{
-			insert_menu();
+			time_t end = time(NULL);							//종료선택시 실행시간 저장 
+			time_min = (int)(end - start) / 60;					//end - start 를 빼고 60으로 나누면 실행시간 (분) 저장
+			day_money = time_pay * time_min;					//하루 일당에 시급 * 실행시간을 저장
+			printf("총 %d분 일했습니다 오늘 일당은: %d\n", time_min, day_money);	//하루 일당 출력
+			break;												//while문 종료 
 		}
-		else if(select_menu == 2)
-		{
-			product_check_menu();
-		}
-		else if(select_menu == 3)
-		{
-			product_receving_menu();
-		}
-		else if(select_menu == 4)
-		{
-			paying_menu();
-		}
-		else if(select_menu == 5)
-		{
-			time_t end = time(NULL);
-			time_min = (int)(end - start) / 60;
-			day_money = time_pay * time_min;
-			printf("총 %d분 일했습니다 오늘 일당은: %d\n", time_min, day_money);
-			break;
-		}
-		else
-		{
-			printf("잘못입력하셨습니다. 1~5번 입력해주세요");
-		}
+		else{printf("잘못입력하셨습니다. 1~5번 입력해주세요");}
 	}
-	return 0;
+	return 0;													//종료
 }
 
 //로그인 함수 선언 (아이디와 비밀번호가 맞는지 확인하는 함수)
@@ -99,46 +83,42 @@ void login_check(char arr1[10], char arr2[10])	//admin과 1234를 arr1, arr2에 
 {
 	char check_identification[10];			//아이디를 확인하기위한 문자형 배열 선언
 	char check_password[10];				//비밀번호를 확인하기위한 문자형 배열 선언
-	while(1){
-	printf("============Login Menu================ \n");
-	printf("insert id: ");					
-	scanf("%s", check_identification);		//check_identification에 입력받기
-	
-	printf("insert password: ");
-	scanf("%s", check_password);			//check_password에 입력받기
-	printf("====================================== \n");
-	if(!strcmp(arr1, check_identification) && !strcmp(arr2, check_password))	// 아이디와 비밀번호가 둘다 맞는경우 login access 출력
+	while(1)
 	{
-		printf("login access\n");
-		break;
+		printf("============Login Menu================ \n");
+		printf("insert id: ");scanf("%s", check_identification);		//check_identification에 입력받기
+		printf("insert password: ");scanf("%s", check_password);			//check_password에 입력받기
+		printf("====================================== \n");
+		if(!strcmp(arr1, check_identification) && !strcmp(arr2, check_password))	// 아이디와 비밀번호가 둘다 맞는경우 login access 출력
+		{
+			printf("login access\n");
+			break;
+		}
+		else																		//아이디 혹은 비밀번호가 둘중 하나라도 틀리면 login default 출력
+		{
+			printf("login default try again\n");
+		}
 	}
-	else																		//아이디 혹은 비밀번호가 둘중 하나라도 틀리면 login default 출력
-	{
-		printf("login default try again\n");
-	}
-	}
-	system("clear");
+	system("clear");	//콘솔화면 초기화
 }
 //사원 확인 하기
 void employee_confirmation(char name[20], char check_name[20])
 {	
 	char check_employee[20];
-	
 	printf("===================================== \n");
 	printf("사원 : %s", name);
-	printf("사원이 맞습니까? 맞다면 ""확인"" 을입력하세요: ");
-	scanf("%s", check_employee);
+	printf("사원이 맞습니까? 맞다면 ""확인"" 을입력하세요: ");scanf("%s", check_employee);//입력받은 문자를 저장
 	
-	if(!strcmp(check_name, check_employee)) //확인 입력시 메인함수 다음 구문  진행
+	if(!strcmp(check_name, check_employee)) //입력받은 문자와 check_name[20] = "확인"이 맞는지비교
 	{
-		printf("확인되었습니다 \n");	
+		printf("확인되었습니다 \n");		//맞을시 출력
 	}
 	else									//확인외 다른거 입력시 종료
 	{
-		printf("다시실행하세요\n");
-		exit(0);
+		printf("다시실행하세요\n");			//틀릴시 출력
+		exit(0);							//pos종료
 	}			
-	system("clear");
+	system("clear");						//콘솔화면 초기화
 }
 //메뉴 보여주기;
 int show_menu()
@@ -146,22 +126,21 @@ int show_menu()
 	int select_menu = select_menu;
 	printf("==================================== \n");
 	printf("1.제품 입력\t2.제품 확인(제품 찾기)\t3.제품 입고\t4.계산\t5.종료 \n");
-	printf("메뉴 선택(숫자 입력1~5): ");
-	scanf("%d", &select_menu);
+	printf("메뉴 선택(숫자 입력1~5): ");scanf("%d", &select_menu);
 	printf("==================================== \n");
 	system("clear");
-	return select_menu;
+	return select_menu;		//몇번을 골랐는지 반환
 }	
 //제품 입력 메뉴
 void insert_menu()
 {
 	int product_plus = 0;
-	if(num == 0) //이건 입고가 아닐시 출력하는거
+	if(num == 0) //제품 입고가 아닐시 출력한다
 	{
 		if(product_count < 10)
 		{
 			printf("최소 제품입력은 10개입니다.");			//처음실행시 제품입력 10개하기
-			for(int i = 0; i < 10; i++){
+			for(int i = 0; i < 10; i++){	
 				printf("현재 제품입력수 [%d 개]\n", product_count);
 				printf("제품명입력: "); scanf("%s", productlist[product_count].name);
 				printf("제조회사입력: "); scanf("%s", productlist[product_count].company);
@@ -172,7 +151,7 @@ void insert_menu()
 				product_count++;
 			}
 		}
-		else if(product_count < 101 && product_count >= 10)			//제품이 10개이상이면 무조건 1개씩 제품추가
+		else if(product_count < 101 && product_count >= 10)			//제품이 이미10개이상 있다면 무조건 1개씩 제품추가
 		{
 			printf("제품명입력: "); scanf("%s", productlist[product_count].name);
 			printf("제조회사입력: "); scanf("%s", productlist[product_count].company);
@@ -182,7 +161,7 @@ void insert_menu()
 			printf("제품 추가 완료\n");
 			product_count++;
 		}
-		else
+		else	//제품이 101개 이상일시 제품추가 불가
 		{
 			printf("제품을 추가할 수 없습니다. \n");
 		}
@@ -192,8 +171,7 @@ void insert_menu()
 
 	else if(num != 0)					//제품 입고시 출력하는것
 		{
-			printf("몇개 입고하시겠습니까?: ");
-			scanf("%d", &product_plus); //product_total
+			printf("몇개 입고하시겠습니까?: ");scanf("%d", &product_plus); //product_total
 			productlist[num-1].product_total += product_plus;
 			num = 0;
 	
@@ -203,26 +181,25 @@ void insert_menu()
 //제품확인메뉴
 void product_check_menu()
 {
-	char product_find[50];
+	char product_find[50];											//제품 찾기위해 문자형 변수 선언
 	for(int i = 0; i < product_count; i++)
 	{
-		printf("%s ", productlist[i].name);
+		printf("%s ", productlist[i].name);							//이름출력
 
 		for(int j = 0; j < productlist[i].product_total; j++)
 		{
-			printf("* ");
+			printf("* ");											//제품의 갯수의 따라서 * 출력 5개면 ***** 입력
 		}
 
-		printf("(%d개)", productlist[i].product_total);
+		printf("(%d개)", productlist[i].product_total);				//몇개인지 까지 출력
 		printf("\n");
 	}
-	printf("찾으실 제품을 입력하세요: ");
-	scanf("%s", product_find);
+	printf("찾으실 제품을 입력하세요: ");scanf("%s", product_find);	//제품 찾기 입력받음
 	for(int i = 0; i < product_count; i++)
 	{
-		if(!strcmp(productlist[i].name, product_find))
+		if(!strcmp(productlist[i].name, product_find))				//입력받은제품이름과 등록된 제품이름이 있는지 확인
 		{
-			printf("이름:%s |제조회사: %s|유통기한: %s|19금물품: %d|가격: %d \n", 
+			printf("이름:%s |제조회사: %s|유통기한: %s|19금물품: %d|가격: %d \n",	//제품이 있다면 제품 정보 출력
 					productlist[i].name, productlist[i].company, productlist[i].time, productlist[i].adult, productlist[i].price);
 		}
 	}
@@ -234,7 +211,7 @@ void product_receving_menu()
 {
 	
 	printf("제품 목록 \n");
-	for(int i = 0; i < product_count; i++)
+	for(int i = 0; i < product_count; i++)	//제품 목록 출력
 	{
 		printf("%d.이름: %s | 제조회사: %s | 유통기한:%s | 19금물품: %d | 가격: %d \n", 
 		i+1, productlist[i].name, productlist[i].company, productlist[i].time, productlist[i].adult, productlist[i].price);
@@ -310,7 +287,7 @@ void product_buy(int price, int total)
 	{
 		printf("카드or현금?(카드1현금2):");
 		scanf("%d", &card_cash);
-		if(card_cash == 1)
+		if(card_cash == 1)					//카드일시
 		{
 			
 			printf("카드결제금액을 입력하세요: ");
@@ -318,7 +295,7 @@ void product_buy(int price, int total)
 			balance += price * product_buy_num; // 물건값 * 사는갯수를 잔고에서 차감
 			printf("결제금액: %d 입니다. \n", price*product_buy_num);
 		}
-		else if(card_cash == 2)
+		else if(card_cash == 2)				//현금일시
 		{
 			printf("얼마를 내시겠습니까?: ");
 			scanf("%d", &cash);
@@ -347,21 +324,16 @@ void product_buy(int price, int total)
 
 int adult_checking()
 {
-	int year = 2025;
-	int birthyear = 0;
-	printf("태어난 연도를 적어주세요: ");
-	scanf("%d", &birthyear);
-	
+	int year = 2025;							//이번년도
+	int birthyear = 0;							
+	printf("태어난 연도를 적어주세요: ");scanf("%d", &birthyear);	//생년월일 입력받기
 	year = year - birthyear;
-	
-	if(year >= 19)
+	if(year >= 19)			//19세이상이면
 	{
-		return 1;
+		return 1;			//1반환
 	}
-	else
+	else					//아니면
 	{
-		return 0;
+		return 0;			//0반환
 	}
 }
-
-
