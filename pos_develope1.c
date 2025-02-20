@@ -173,6 +173,7 @@ void insert_menu()
 		{
 			printf("몇개 입고하시겠습니까?: ");scanf("%d", &product_plus); //product_total
 			productlist[num-1].product_total += product_plus;
+			balance -= productlist[num-1].price * product_plus;
 			num = 0;
 	
 	}
